@@ -401,7 +401,7 @@ jobs:
           set -euo pipefail
           test -x build/release/bin/lichii
           test -x build/release/bin/eden-cli
-          strip build/release/bin/lichii build/release/bin/eden-cli
+          # fork build: keep the symbols for profiling
           tar -czf "lichii-${GITHUB_SHA}-${{ matrix.platform }}.tar.gz" \
             -C build/release/bin lichii eden-cli
           ls -la "lichii-${GITHUB_SHA}-${{ matrix.platform }}.tar.gz"
@@ -428,6 +428,7 @@ jobs:
           icon="$RUNNER_TEMP/io.github.zortos293.lichii.png"
           cp dist/lichii.png "$icon"
           export APPIMAGE_EXTRACT_AND_RUN=1
+          export NO_STRIP=1
           export QMAKE="$QT_ROOT_DIR/bin/qmake"
           # Include Wayland platform plugins and their graphics/shell integrations.
           export EXTRA_QT_MODULES=waylandcompositor
