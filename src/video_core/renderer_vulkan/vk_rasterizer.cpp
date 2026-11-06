@@ -2153,9 +2153,22 @@ bool RasterizerVulkan::UsesNvidiaDlss() const {
 }
 
 bool RasterizerVulkan::EmulatesNativeTensorPrograms() const {
+    // EDEN_NX2_TENSOR_EMULATION=0 never emulates them, =1 always does.
+    if (const char* option = std::getenv("EDEN_NX2_TENSOR_EMULATION"); option && *option) {
+        return *option != '0';
+    }
     // Mesa's Intel driver takes minutes to compile an emulated network (Ocarina of Time's has 768
     // matrix multiplies) and then runs it at about 8 FPS. The upscale stand-in draws instead.
-    return device.GetDriverID() != VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA;
+    // The Steam Deck's Van Gogh GPU (RADV) is the same: the network keeps all 8 CUs busy and the
+    // intro stays at 8 FPS, against about 55 FPS without it.
+    switch (device.GetDriverID()) {
+    case VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA:
+        return false;
+    case VK_DRIVER_ID_MESA_RADV:
+        return device.GetModelName().find("VANGOGH") == std::string_view::npos;
+    default:
+        return true;
+    }
 }
 
 bool RasterizerVulkan::SupportsGameDlssNetwork() const {
