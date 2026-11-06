@@ -2071,6 +2071,29 @@ bool RasterizerVulkan::AccelerateSurfaceCopy(const Tegra::Engines::Fermi2D::Surf
                                              const Tegra::Engines::Fermi2D::Surface& dst,
                                              const Tegra::Engines::Fermi2D::Config& copy_config) {
     std::scoped_lock lock{texture_cache.mutex};
+    if (copy_config.operation == Tegra::Engines::Fermi2D::Operation::SrcCopySquare) {
+        // Experiment switches for the speckles in Ocarina's upscaler stand-in.
+        static const bool barrier = std::getenv("EDEN_NX2_STANDIN_BARRIER") != nullptr;
+        static const bool point = std::getenv("EDEN_NX2_STANDIN_POINT") != nullptr;
+        if (barrier) {
+            scheduler.RequestOutsideRenderPassOperationContext();
+            static constexpr VkMemoryBarrier FULL_BARRIER{
+                .sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+                .pNext = nullptr,
+                .srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT,
+                .dstAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT,
+            };
+            scheduler.Record([](vk::CommandBuffer cmdbuf) {
+                cmdbuf.PipelineBarrier(VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+                                       VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, FULL_BARRIER);
+            });
+        }
+        if (point) {
+            auto config = copy_config;
+            config.filter = Tegra::Engines::Fermi2D::Filter::Point;
+            return texture_cache.BlitImage(dst, src, config);
+        }
+    }
     return texture_cache.BlitImage(dst, src, copy_config);
 }
 
