@@ -47,6 +47,13 @@ void Pause() {
 
 [[maybe_unused]] std::atomic<u32> g_back_thread_id{};
 
+u32 SpinBudget(const char* name, u32 fallback) {
+    if (const char* value = std::getenv(name); value && *value) {
+        return static_cast<u32>(std::strtoul(value, nullptr, 10));
+    }
+    return fallback;
+}
+
 } // Anonymous namespace
 
 void GpuSplit::CheckOwner(const char* where) {
@@ -247,7 +254,9 @@ bool GpuSplit::WaitFor(u64 target, DrainSite site) {
 }
 
 void GpuSplit::Backoff(u32 spins, u64 target) {
-    if (spins < 16384) {
+    // A power-limited APU such as the Steam Deck's loses more to a spinning thread than it gains.
+    static const u32 front_spins = SpinBudget("EDEN_NX2_SPLIT_SPIN", 16384);
+    if (spins < front_spins) {
         Pause();
         return;
     }
@@ -423,7 +432,8 @@ void GpuSplit::BackLoop(std::stop_token stop_token) {
         if (available == read_position) {
             Nx2Profile::Scope scope{Nx2Profile::Zone::SplitWait};
             // The front usually sends more within microseconds: spin briefly before sleeping.
-            for (u32 spins = 0; spins < 8192 && available == read_position &&
+            static const u32 back_spins = SpinBudget("EDEN_NX2_SPLIT_BACK_SPIN", 8192);
+            for (u32 spins = 0; spins < back_spins && available == read_position &&
                                 !hook_requested.load(std::memory_order_relaxed);
                  ++spins) {
                 Pause();
