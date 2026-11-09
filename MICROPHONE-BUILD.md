@@ -17,7 +17,7 @@ If the input device cannot open, the game receives silence instead of a failed s
 
 ## Revision 2 correction
 
-The first public package used MinGW. Although the microphone fix worked locally, that toolchain excluded the MSVC-only Streamline integration and omitted the DLSS checkbox. This was our packaging error. Revision 2 uses clang-cl with the MSVC ABI and explicitly enables `ENABLE_NVIDIA_DLSS=ON`; no renderer patch or third-party DLSS injection mod was added.
+The first public package used MinGW. Although the microphone fix worked locally, that toolchain excluded the MSVC-only Streamline integration and omitted the DLSS checkbox. This was my packaging error. Revision 2 uses clang-cl with the MSVC ABI and explicitly enables `ENABLE_NVIDIA_DLSS=ON`; no renderer patch or third-party DLSS injection mod was added.
 
 The source of the tested binary is `b07ab3985c8a22f6c29db36f74751233f68363d9` at https://github.com/GonzaCass/Lichii/tree/b07ab3985c8a22f6c29db36f74751233f68363d9. Later documentation commits do not change that binary. The PR contains only the microphone ports and Windows test-harness changes.
 
@@ -31,6 +31,8 @@ Package with the matching Qt 6.8.3 `windeployqt.exe --release --no-translations 
 
 ## Validation
 
-The clang-cl build passed all 39 focused microphone/audio-input/sysmix tests (14,566 assertions). On the local RTX 3090 system the player confirmed the DLSS checkbox appears and the save loads. Logs confirmed Streamline 2.14.16, NVIDIA DLSS model 310.9.16 and real 2560x1440 to 3840x2160 DLSS evaluations/presentation, without a DLSS recording failure in the observed session. The player also confirmed working ocarina microphone input in the same corrected build; logs reported nonzero captured microphone samples.
+The clang-cl build passed all 39 focused microphone/audio-input/sysmix tests (14,566 assertions). On the local RTX 3090 system I confirmed the DLSS checkbox appears and the save loads. Logs confirmed Streamline 2.14.16, NVIDIA DLSS model 310.9.16 and real 2560x1440 to 3840x2160 DLSS evaluations/presentation, without a DLSS recording failure in the observed session. I also confirmed working ocarina microphone input in the same corrected build; logs reported nonzero captured microphone samples.
 
 This does not reproduce or prove a fix for another user's after-shader crash. If it persists with revision 2, export a fresh log through Help > Export Log and attach it to the report. The prior stock-build log does not diagnose the corrected package.
+
+I was able to put this together with the help of AI.
