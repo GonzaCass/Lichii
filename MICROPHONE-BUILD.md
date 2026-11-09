@@ -1,49 +1,36 @@
-# Fritchii v5.5 with microphone input
+# Fritchii v5.5 + microphone + native DLSS (revision 2)
 
-Download: https://github.com/GonzaCass/Lichii/releases/tag/fritchii-v5.5-microphone
-
-Source: https://github.com/GonzaCass/Lichii/tree/microphone-v5.5
-
-This is an unofficial Windows x64 build of Frizti/Fritchii v5.5, with the Switch 2 microphone support from zortos293/Lichii #497 and the unavailable-device fallback from #881. Credit for the original capture implementation belongs to rolling-not-trolling and the upstream contributors. Fritchii's v5.5 graphics and performance changes are retained.
+Unofficial Windows x64 build based on Frizti/Fritchii v5.5 (`4012e5271e278b21cf8f56b97481dac2b777cd0d`). Microphone capture is ported from zortos293/Lichii #497, with the unavailable-device fallback from #881. Credit belongs to rolling-not-trolling and the upstream contributors. The microphone PR is https://github.com/Frizti/Fritchii/pull/31.
 
 ## Download and use
 
-Download the Windows ZIP from this repository's **Fritchii v5.5 + Microphone** release. GitHub's automatic "Source code" archives are not playable builds.
+Download the Windows ZIP from https://github.com/GonzaCass/Lichii/releases/tag/fritchii-v5.5-microphone-r2. Automatic GitHub source archives are not runnable builds.
 
-1. Extract the entire ZIP into a new folder on your SSD. Keep its DLLs and subfolders beside `lichii.exe`.
-2. Run `lichii.exe` and use your own compatible game files. No game, keys, firmware, saves, or extracted game shaders are included.
-3. Before starting emulation, open **Emulation > Configure > Controls > Microphone**. Select your input device, set its volume, and use **Start microphone test** to check the level meter.
-4. Apply the selection, stop the preview test, and start the game. Humming, singing, or an instrument must reach the selected Windows input device.
+1. Extract the complete ZIP into a fresh folder on your SSD. Do not mix DLLs with the earlier MinGW build. Run `vc_redist.x64.exe` if Windows needs the Microsoft C++ runtime.
+2. Run `lichii.exe` and open your own compatible game files. No game, keys, firmware, saves or extracted game shaders are included. Only shader recipe metadata is included.
+3. With emulation stopped, open **Emulation > Configure > Controls > Microphone**, choose your Windows input and use **Start microphone test**. Apply the selection and stop the preview before playing. Humming or an instrument must reach that Windows device.
+4. On a supported NVIDIA GPU, native DLSS is available under **Emulation > Configure > Graphics > Use NVIDIA DLSS**. The local test used preset K. NVIDIA runtime components are managed by the emulator/NVIDIA App, not bundled in this ZIP. DLSS Super Resolution does not imply Frame Generation support.
 
-The build uses the existing Eden/Fritchii user-data folder unless you explicitly configure portable mode. Back up your saves before switching builds. A newly selected release/driver can require shader preparation again. Only a metadata recipe is included; the emulator builds shaders from the player's own files.
+The existing Eden/Fritchii user-data folder is reused unless you configure portable mode. Back up saves before switching builds. Shader preparation may repeat after a compiler, release or driver change. The custom automatic updater is disabled so it cannot silently replace the microphone build.
 
-If Windows cannot open or start the input, the game receives silence instead of a failed stream. This avoids the known null-input-stream panic, but silence is not working microphone capture: check the device and Windows microphone permissions if the meter does not move. Other causes of game crashes are outside this fix. Device and gain changes require stopped emulation. If you change the Audio backend, apply it and reopen Configure before testing the microphone.
+If the input device cannot open, the game receives silence instead of a failed stream. Silence is not working microphone capture: check Windows permissions and device selection. Device/gain changes require stopped emulation. After changing the Audio backend, apply it and reopen Configure before testing the microphone. This fix does not cover every possible game crash.
 
-The official automatic updater is disabled in this custom build so it cannot replace the microphone fix with an official binary that lacks it. Install later custom releases manually, or return to official Fritchii once it includes microphone support.
+## Revision 2 correction
 
-## Descargar y usar
+The first public package used MinGW. Although the microphone fix worked locally, that toolchain excluded the MSVC-only Streamline integration and omitted the DLSS checkbox. This was our packaging error. Revision 2 uses clang-cl with the MSVC ABI and explicitly enables `ENABLE_NVIDIA_DLSS=ON`; no renderer patch or third-party DLSS injection mod was added.
 
-DescargÃƒÂ¡ el ZIP de Windows de la release **Fritchii v5.5 + Microphone**, extraelo completo en el SSD y ejecutÃƒÂ¡ `lichii.exe`. Los archivos automÃƒÂ¡ticos "Source code" no contienen el programa compilado.
+The source of the tested binary is `b07ab3985c8a22f6c29db36f74751233f68363d9` at https://github.com/GonzaCass/Lichii/tree/b07ab3985c8a22f6c29db36f74751233f68363d9. Later documentation commits do not change that binary. The PR contains only the microphone ports and Windows test-harness changes.
 
-Con el juego detenido, entrÃƒÂ¡ en **Emulation > Configure > Controls > Microphone**, elegÃƒÂ­ tu entrada de Windows y usÃƒÂ¡ **Start microphone test**. El medidor debe responder a tu voz o instrumento. AplicÃƒÂ¡ el ajuste y abrÃƒÂ­ tu propio juego. Si el dispositivo no puede abrirse, el juego recibe silencio; revisÃƒÂ¡ la selecciÃƒÂ³n y los permisos de Windows.
+## Build
 
-No se incluyen juego, claves, firmware, partidas ni shaders extraÃƒÂ­dos del juego. ConservÃƒÂ¡ todos los DLL y subdirectorios del ZIP. RespaldÃƒÂ¡ tus partidas antes de cambiar de versiÃƒÂ³n. La preparaciÃƒÂ³n inicial de shaders puede repetirse al cambiar de versiÃƒÂ³n o controlador. Esta compilaciÃƒÂ³n no se actualiza automÃƒÂ¡ticamente a la versiÃƒÂ³n oficial para evitar perder el fix.
+Windows x64; clang-cl/LLD 23.1.5; MSVC tools 14.44.35207; Windows SDK 10.0.26100; Qt 6.8.3 MSVC2022 x64; Release, repository PGO profile and ThinLTO. Install VS 2022 C++ Build Tools, Ninja, CMake, compatible LLVM and Qt. Use the MSVC environment loader in `tools/windows/load-msvc-env.ps1`.
 
-## Source and build
+The reference script is `tools/windows/build-microphone-dlss.ps1`. Supply LLVM, Qt, CMake and Ninja paths. Keep MinGW include/library/package paths out of the MSVC configuration; use a fresh build directory. Dependencies and hashes are recorded in the repository CPM manifests and packaged `dependency-sources.json`.
 
-Base: `Frizti/Fritchii`, tag `fritchii-v5.5`, commit `4012e5271e278b21cf8f56b97481dac2b777cd0d`. The microphone and fallback ports are separate commits. Windows test-harness fixes are a separate commit and do not change the emulator's stack reserve or graphics behavior.
+Package with the matching Qt 6.8.3 `windeployqt.exe --release --no-translations --no-compiler-runtime --no-opengl-sw --no-system-dxc-compiler --no-system-d3d-compiler`, the matching upstream Windows DX compiler/DXIL/software OpenGL files and redistributable, licenses, `qt.conf` and metadata recipe. Audit PE imports. Do not bundle personal user data or proprietary NVIDIA SDK runtime DLLs. See `LICENSE.txt`, `LICENSES/` and the corresponding source for licensing.
 
-The downloadable build uses MSYS2 UCRT64, Clang/LLD 23.1.5, Release, the repository's `eglantine.profdata` PGO profile, ThinLTO, and system Qt 6.12. Follow the upstream dependency documentation. Configuration used `BUILD_TESTING=ON`, `YUZU_TESTS=ON`, `YUZU_CMD=OFF`, `YUZU_ROOM=OFF`, `YUZU_USE_BUNDLED_QT=OFF`, `YUZU_USE_BUNDLED_SDL3=OFF`, `YUZU_USE_BUNDLED_FFMPEG=OFF`, `YUZU_USE_BUNDLED_OPENSSL=OFF`, `ENABLE_UPDATE_CHECKER=OFF`, `ENABLE_WEB_SERVICE=OFF`, `USE_DISCORD_PRESENCE=OFF`, `ENABLE_LTO=ON`, and `ENABLE_WERROR=OFF`. Select `clang`/`clang++`, `llvm-ar`/`llvm-ranlib` for compiler archives, and LLD. Pass `-fprofile-use=<absolute path to eglantine.profdata>` to Clang along with `-fuse-ld=lld`, `-Wno-backend-plugin`, `-Wno-profile-instr-unprofiled`, and `-Wno-profile-instr-out-of-date`.
+## Validation
 
-```sh
-cmake --build build --target yuzu tests --parallel 6
-build/bin/tests.exe '*Microphone*,*Audio input*,[input],[sysmix],[sysmix_sink]' --reporter compact
-```
+The clang-cl build passed all 39 focused microphone/audio-input/sysmix tests (14,566 assertions). On the local RTX 3090 system the player confirmed the DLSS checkbox appears and the save loads. Logs confirmed Streamline 2.14.16, NVIDIA DLSS model 310.9.16 and real 2560x1440 to 3840x2160 DLSS evaluations/presentation, without a DLSS recording failure in the observed session. The input logs also reported nonzero captured microphone samples.
 
-Use `windeployqt6` and include the non-system DLL dependencies when packaging a MinGW build; copying the executable alone is insufficient. Include licenses and the corresponding source. See `LICENSE.txt`, `LICENSES/`, and the upstream dependency manifests for licensing.
-
-## Validation of this build
-
-The Windows build completed and the focused audio/input/sysmix suite passed: 39 cases, 12,754 assertions. An initial run alongside shader preparation and compilation failed the existing output-concurrency case; the full rerun and three separate repeats of that case passed. No output implementation or test assertion was changed to suppress that result. The test executable uses the stack reserve configured in the Windows test-harness commit.
-
-Real ocarina microphone capture was confirmed by the player on our previous v5.1 port of #497. This v5.5 build has automated coverage, including the unavailable-device fallback; a fresh manual gameplay confirmation on v5.5 is still pending. The release is published as a prerelease.
+This does not reproduce or prove a fix for another user's after-shader crash. If it persists with revision 2, export a fresh log through Help > Export Log and attach it to the report. The prior stock-build log does not diagnose the corrected package.
