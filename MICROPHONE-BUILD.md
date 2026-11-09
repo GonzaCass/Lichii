@@ -1,5 +1,9 @@
 # Fritchii v5.5 with microphone input
 
+Download: https://github.com/GonzaCass/Lichii/releases/tag/fritchii-v5.5-microphone
+
+Source: https://github.com/GonzaCass/Lichii/tree/microphone-v5.5
+
 This is an unofficial Windows x64 build of Frizti/Fritchii v5.5, with the Switch 2 microphone support from zortos293/Lichii #497 and the unavailable-device fallback from #881. Credit for the original capture implementation belongs to rolling-not-trolling and the upstream contributors. Fritchii's v5.5 graphics and performance changes are retained.
 
 ## Download and use
@@ -19,11 +23,11 @@ The official automatic updater is disabled in this custom build so it cannot rep
 
 ## Descargar y usar
 
-DescargÃ¡ el ZIP de Windows de la release **Fritchii v5.5 + Microphone**, extraelo completo en el SSD y ejecutÃ¡ `lichii.exe`. Los archivos automÃ¡ticos "Source code" no contienen el programa compilado.
+DescargÃƒÂ¡ el ZIP de Windows de la release **Fritchii v5.5 + Microphone**, extraelo completo en el SSD y ejecutÃƒÂ¡ `lichii.exe`. Los archivos automÃƒÂ¡ticos "Source code" no contienen el programa compilado.
 
-Con el juego detenido, entrÃ¡ en **Emulation > Configure > Controls > Microphone**, elegÃ­ tu entrada de Windows y usÃ¡ **Start microphone test**. El medidor debe responder a tu voz o instrumento. AplicÃ¡ el ajuste y abrÃ­ tu propio juego. Si el dispositivo no puede abrirse, el juego recibe silencio; revisÃ¡ la selecciÃ³n y los permisos de Windows.
+Con el juego detenido, entrÃƒÂ¡ en **Emulation > Configure > Controls > Microphone**, elegÃƒÂ­ tu entrada de Windows y usÃƒÂ¡ **Start microphone test**. El medidor debe responder a tu voz o instrumento. AplicÃƒÂ¡ el ajuste y abrÃƒÂ­ tu propio juego. Si el dispositivo no puede abrirse, el juego recibe silencio; revisÃƒÂ¡ la selecciÃƒÂ³n y los permisos de Windows.
 
-No se incluyen juego, claves, firmware, partidas ni shaders extraÃ­dos del juego. ConservÃ¡ todos los DLL y subdirectorios del ZIP. RespaldÃ¡ tus partidas antes de cambiar de versiÃ³n. La preparaciÃ³n inicial de shaders puede repetirse al cambiar de versiÃ³n o controlador. Esta compilaciÃ³n no se actualiza automÃ¡ticamente a la versiÃ³n oficial para evitar perder el fix.
+No se incluyen juego, claves, firmware, partidas ni shaders extraÃƒÂ­dos del juego. ConservÃƒÂ¡ todos los DLL y subdirectorios del ZIP. RespaldÃƒÂ¡ tus partidas antes de cambiar de versiÃƒÂ³n. La preparaciÃƒÂ³n inicial de shaders puede repetirse al cambiar de versiÃƒÂ³n o controlador. Esta compilaciÃƒÂ³n no se actualiza automÃƒÂ¡ticamente a la versiÃƒÂ³n oficial para evitar perder el fix.
 
 ## Source and build
 
