@@ -96,11 +96,11 @@
 
 #ifdef __ANDROID__
 #include "../../android/app/src/main/jni/android_settings.h"
+#endif
 
 // X11 defines Status as a macro; the pipeline merge status enum is named Status too.
 #ifdef Status
 #undef Status
-#endif
 #endif
 
 namespace Vulkan {
