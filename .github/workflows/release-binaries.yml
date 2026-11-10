@@ -82,28 +82,6 @@ jobs:
         include:
           - platform: linux-x86_64
             runner: ubuntu-24.04
-          # The Linux -pgo builds are the same programs compiled by clang against the repo's
-          # eglantine.profdata. Eden's profile (Eden-CI/PGO) comes from Switch 1 games: with it Mario
-          # Kart World ran at about half the speed of the normal build, with eglantine.profdata at
-          # about the same speed. Both Windows builds are clang-cl with ThinLTO; windows-x86_64-pgo
-          # adds lichii-windows.profdata, an MSVC-ABI profile trained on Ocarina of Time (see
-          # docs/CI.md). MSVC still builds for development.
-          - platform: linux-x86_64-pgo
-            runner: ubuntu-24.04
-            pgo: true
-          - platform: windows-x86_64
-            runner: windows-2022
-          - platform: windows-x86_64-pgo
-            runner: windows-2022
-            pgo: true
-            profile: lichii-windows.profdata
-          - platform: linux-aarch64
-            runner: ubuntu-24.04-arm
-          - platform: linux-aarch64-pgo
-            runner: ubuntu-24.04-arm
-            pgo: true
-          - platform: macos-arm64
-            runner: macos-15
 
     steps:
       - name: Check out source
@@ -394,7 +372,6 @@ jobs:
           test -x build/release/bin/lichii
           test -x build/release/bin/eden-cli
           test -f build/release/bin/libnxformat.so
-          strip build/release/bin/lichii build/release/bin/eden-cli
           tar -czf "lichii-${GITHUB_SHA}-${{ matrix.platform }}.tar.gz" \
             -C build/release/bin lichii eden-cli nx2_switches.txt libnxformat.so
           ls -la "lichii-${GITHUB_SHA}-${{ matrix.platform }}.tar.gz"
@@ -421,6 +398,7 @@ jobs:
           icon="$RUNNER_TEMP/io.github.zortos293.lichii.png"
           cp dist/lichii.png "$icon"
           export APPIMAGE_EXTRACT_AND_RUN=1
+          export NO_STRIP=1
           export QMAKE="$QT_ROOT_DIR/bin/qmake"
           # Include Wayland platform plugins and their graphics/shell integrations.
           export EXTRA_QT_MODULES=waylandcompositor
