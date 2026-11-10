@@ -194,6 +194,10 @@ try
         scheduler.RegisterOnSubmit([this] { turbo_mode->QueueSubmitted(); });
     }
 
+    // The Steam Deck is left out of the turbo mode above (it would take power from the CPU); its
+    // GPU's lowest clock is raised instead.
+    deck_gpu_clock = std::make_unique<DeckGpuClock>(device);
+
 #ifdef HAS_RESHADE
     VideoCore::FxChain::Instance().LoadFromSettings();
 #endif
