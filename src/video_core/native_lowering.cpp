@@ -30,11 +30,17 @@ bool LoadsProgramCounter(std::span<const Instruction> native, bool geometry) {
            });
 }
 
+bool UsesMatrixMultiply(std::span<const Instruction> native) {
+    return std::ranges::any_of(
+        native, [](const Instruction& instruction) { return instruction.Bits(0, 12) == 0x23c; });
+}
+
 Shader::Ampere::LoweredProgram LowerNativeProgram(std::span<const Instruction> native,
                                                   const NativeLoweringInputs& inputs) {
     const std::vector<u32> verified_traps = NativeTrapOffsets(native);
     return Shader::Ampere::LowerToMaxwell(native, {.geometry = inputs.geometry,
                                                    .tensor = true,
+                                                   .reject_matrix = inputs.reject_matrix,
                                                    .native_code_address = inputs.native_code_address,
                                                    .verified_traps = verified_traps,
                                                    .tessellation_stage = inputs.tessellation_stage});

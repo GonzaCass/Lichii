@@ -647,11 +647,15 @@ std::shared_ptr<const LoweredNativeCode> GenericEnvironment::LowerNativeCode(
                                        : Shader::Ampere::TessellationStage::None;
     const NativeLoweringInputs inputs{.geometry = geometry_stage,
                                       .tessellation_stage = tessellation_stage,
-                                      .native_code_address = program_base + native_header_size};
+                                      .native_code_address = program_base + native_header_size,
+                                      .reject_matrix = reject_native_matrix};
     // A program the v2 cache holds a record of from this build's lowering is not lowered again:
     // the lowering depends on nothing else. Every check below still runs on its code.
     ShaderCacheV2::FoundProgram found;
-    if (cache_v2) {
+    // A lowering made while matrix multiplies were emulated must not stand in for one made while
+    // they are rejected (the cache's key does not hold the setting): programs with a matrix
+    // multiply are lowered again then.
+    if (cache_v2 && !(reject_native_matrix && UsesMatrixMultiply(native))) {
         found = cache_v2->FindProgram(ShaderCacheV2::MakeProgramKeyInputs(
             stage, native_header_size, sph, native, inputs, verified_traps));
     }
@@ -1065,6 +1069,7 @@ ComputeEnvironment::ComputeEnvironment(Tegra::Engines::KeplerCompute& kepler_com
     if (kepler_compute->IsNativeMode()) {
         initial_offset = sizeof(sph);
         is_proprietary_driver = true;
+        reject_native_matrix = !kepler_compute->EmulatesNativeTensorPrograms();
         InitializeNativeCode(std::move(lowered_native_), 0, false, cache_v2);
         start_address = sizeof(sph);
     }

@@ -43,7 +43,12 @@ struct NativeLoweringInputs {
     /// Where the code is in guest memory. Only programs loading their own address read it (see
     /// LoadsProgramCounter).
     u64 native_code_address{};
+    /// Reject matrix multiplies instead of emulating them (KeplerCompute::EmulatesNativeTensorPrograms).
+    bool reject_matrix{};
 };
+
+/// Whether a native program holds a matrix multiply (HMMA).
+[[nodiscard]] bool UsesMatrixMultiply(std::span<const Shader::Ampere::Instruction> native);
 
 /// Byte offsets of the trap instructions, whose guards the caller verifies before lowering
 [[nodiscard]] std::vector<u32> NativeTrapOffsets(
